@@ -1,0 +1,150 @@
+# Telemetry's test: three ARC flights, timed and typed, then the log, the
+# trim estimate and a settings change. test.expect checks the CSV on the
+# SD card. Layout: fields at y 125/151/177/203/229 (x 120 left, 360 right);
+# the keyboard's rows at y 166/210/254/298.
+wait 2500                  # board_init and the power zones
+expect "telemetry: ready \(0 flights" 8000
+
+# Flight 1: the stopwatch, then the official timers' readings typed over it
+press OK                   # first motion
+expect "telemetry: flight 1 timer started" 1000
+wait 2000
+press OK                   # touchdown
+expect "telemetry: flight 1 stopped at 2\.[0-9][0-9] s" 1000
+touch 120 125              # Timer 1
+touch 444 254              # <del x4: "2.00" gone
+touch 444 254
+touch 444 254
+touch 444 254
+touch 120 166              # 3
+touch 360 166              # 8
+touch 288 298              # .
+touch 168 166              # 4
+touch 312 166              # 7
+touch 432 298              # done
+expect "telemetry: flight 1 timer 1 = 38.47" 1000
+touch 360 125              # Timer 2: 38.52
+touch 120 166
+touch 360 166
+touch 288 298
+touch 216 166
+touch 72 166
+touch 432 298
+expect "telemetry: flight 1 timer 2 = 38.52" 1000
+touch 120 151              # Altitude: 812
+touch 360 166
+touch 24 166
+touch 72 166
+touch 432 298
+expect "telemetry: flight 1 score 12.00 \(altitude 12, duration 0.00\)" 1000
+touch 120 177              # Motor: F42-8T (opens on capitals)
+touch 192 210              # F
+touch 36 298               # 123
+touch 168 166              # 4
+touch 72 166               # 2
+touch 48 210               # -
+touch 360 166              # 8
+touch 36 298               # abc
+touch 216 166              # T
+touch 432 298
+expect "telemetry: flight 1 motor = F42-8T" 1000
+touch 360 177              # Mass: 612
+touch 264 166
+touch 24 166
+touch 72 166
+press OK                   # OK accepts too
+expect "telemetry: flight 1 mass = 612" 1000
+touch 120 203              # practice -> qualifying
+expect "telemetry: flight 1 is qualifying" 1000
+screenshot out/flight.png device
+
+# Flight 2: motor, mass and qualifying carry over; too short, and an egg cracked
+press RED                  # New
+expect "telemetry: new flight 2" 1000
+touch 120 125              # Timer 1: 36
+touch 120 166
+touch 264 166
+touch 432 298
+touch 120 151              # Altitude: 836
+touch 360 166
+touch 120 166
+touch 264 166
+touch 432 298
+expect "telemetry: flight 2 score 40.00 \(altitude 36, duration 4.00\)" 1000
+touch 360 177              # Mass: 600 (was 612)
+touch 444 254
+touch 444 254
+touch 444 254
+touch 264 166
+touch 456 166
+touch 456 166
+touch 432 298
+expect "telemetry: flight 2 mass = 600" 1000
+touch 360 151              # eggs: cracked
+expect "telemetry: flight 2 eggs cracked" 1000
+
+# Flight 3: too long
+press RED
+expect "telemetry: new flight 3" 1000
+touch 120 125              # Timer 1: 41.25
+touch 168 166
+touch 24 166
+touch 288 298
+touch 72 166
+touch 216 166
+touch 432 298
+touch 120 151              # Altitude: 790
+touch 312 166
+touch 408 166
+touch 456 166
+touch 432 298
+touch 360 177              # Mass: 624
+touch 444 254
+touch 444 254
+touch 444 254
+touch 264 166
+touch 72 166
+touch 168 166
+touch 432 298
+expect "telemetry: flight 3 score 15.00 \(altitude 10, duration 5.00\)" 1000
+
+expect "telemetry: saved 3 flights" 3000
+
+# The log: flight 2 is disqualified, so the best two are 1 and 3
+press YELLOW
+expect "telemetry: qualifying best two: flights 1 and 3, 12.00 \+ 15.00 = 27.00" 1000
+wait 300
+screenshot out/log.png device
+
+# Trim: the mass that should reach 800 ft with this motor
+press GREEN
+expect "telemetry: trim F42-8T: 3 flights, 619 g for 800 ft \(-19 ft per 10 g\)" 1000
+wait 300
+screenshot out/trim.png device
+
+# A false start on flight 4, cleared by holding CANCEL
+press GREY
+press RED
+expect "telemetry: new flight 4" 1000
+press OK
+expect "telemetry: flight 4 timer started" 1000
+wait 400
+press CANCEL 1300
+expect "telemetry: flight 4 timer cleared" 1000
+expect "telemetry: saved 3 flights" 3000
+
+# Setup: a Finals-style target of 810 ft
+press BLUE
+touch 240 51               # Target altitude
+touch 444 254
+touch 444 254
+touch 444 254
+touch 360 166              # 810
+touch 24 166
+touch 456 166
+touch 432 298
+wait 500
+screenshot out/setup.png device
+press GREY
+wait 300
+quit

@@ -1,0 +1,7 @@
+@sd appdata/telemetry/flights.csv ^flight,date,time,type,motor,mass_g,
+@sd appdata/telemetry/flights.csv ^1,[-0-9]*,[:0-9]*,qualifying,F42-8T,612,,[0-9]+,[0-9]+,38\.47,38\.52,38\.50,812,ok,800,37\.00-40\.00,12,0\.00,12\.00,$
+@sd appdata/telemetry/flights.csv ^2,[-0-9]*,[:0-9]*,qualifying,F42-8T,600,,[0-9]+,[0-9]+,36\.00,,36\.00,836,cracked,800,37\.00-40\.00,36,4\.00,DQ,$
+@sd appdata/telemetry/flights.csv ^3,[-0-9]*,[:0-9]*,qualifying,F42-8T,624,,[0-9]+,[0-9]+,41\.25,,41\.25,790,ok,800,37\.00-40\.00,10,5\.00,15\.00,$
+@sd appdata/telemetry/settings.txt ^target_ft=810$
+!telemetry: save failed
+!^4,
