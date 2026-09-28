@@ -544,9 +544,11 @@ static void sd_connect(void) {
     bool is_dir = false;
     uint32_t size = 0;
     const char *path = CSV_PATH;
+    bool recovered = false;
     ow_status st = ow_sd_stat(&s_dev, path, &is_dir, &size);
     if (st == OW_ERR_FAILED && ow_sd_stat(&s_dev, CSV_NEW, &is_dir, &size) == OW_OK) {
-        path = CSV_NEW;                            /* power went between a save's two steps */
+        path = CSV_NEW;
+        recovered = true;                            /* power went between a save's two steps */
         st = OW_OK;
     }
     if (st != OW_OK) {
@@ -571,7 +573,7 @@ static void sd_connect(void) {
     csv_load(s_csv, got);
     s_sd = s_read_only ? SD_FULL : SD_SAVED;
     DIAG("telemetry: loaded %d flights from %s\n", s_n, path);
-    if (path == (const char *)CSV_NEW) s_save_due = time_us_64();
+    if (recovered) s_save_due = time_us_64();
 }
 
 /* ------------------------------------------------------ typing a value */
