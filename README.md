@@ -116,9 +116,8 @@ Then, from this folder:
 
 Keys in the emulator window: click the screen to touch it; arrows and Enter
 for the D-pad; H O C P for HOME, OK, CANCEL, PAGE; 1–5 for the colour
-buttons. The board clock is in the emulator from the release after 1.0.0
-(`--rtc "2027-05-16 09:30:00"` sets it); with 1.0.0 the app runs without
-dates.
+buttons. The board clock starts at the PC's local time;
+`--rtc "2027-05-16 09:30:00"` sets it.
 
 ## How it's built
 
@@ -128,15 +127,17 @@ dates.
   commands, which need about 10 KB of stack. A PSRAM app leaves the SRAM to
   the stack.
 - The stopwatch reads the time when the main loop sees the button, every
-  2 ms or so. The app doesn't touch the card or the clock while the
-  stopwatch is running, so nothing delays a press.
+  2 ms or so, before anything else. At first motion the app then reads the
+  clock and the sensor once, to stamp the flight; after that it doesn't
+  touch the card or the clock until the stopwatch stops, so nothing delays
+  a press.
 - `test.txt` flies three flights through the touch screen, including a
   disqualified one. It checks the scores, the best-two total and the trim
   estimate, clears a false start, and changes the target. `test.expect`
   checks the CSV that ends up on the SD card.
 
-On the real chip (`fw2emu hwcheck`): 67 KB image, 128 KB of SRAM, 763 KB
-of PSRAM, 11.6 KB of stack.
+On the real chip (`fw2emu hwcheck`): 70 KB image, 200 KB of SRAM, 766 KB
+of PSRAM, 11.4 KB of stack.
 
 Unofficial; not affiliated with FREE-WILi LLC or the American Rocketry
 Challenge.
